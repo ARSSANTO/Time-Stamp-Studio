@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Discord Timestamp Studio</title>
+	<style>
+		:root {
+			color-scheme: dark;
+			--bg: #090909;
+			--panel: #111;
+			--panel2: #181818;
+			--line: #333;
+			--text: #f2f2f2;
+			--muted: #a0a0a0;
+			--accent: #e5e5e5;
+			--green: #d8d8d8
+		}
+
+		* {
+			box-sizing: border-box
+		}
+
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--text);
+			font: 15px/1.5 Inter, system-ui, Segoe UI, sans-serif
+		}
+
+		main {
+			max-width: 1080px;
+			margin: 34px auto;
+			padding: 0 20px 48px
+		}
+
+		.head {
+			margin-bottom: 24px
+		}
+
+		.eyebrow {
+			color: #aaa;
+			font-size: 11px;
+			font-weight: 800;
+			letter-spacing: .16em;
+			text-transform: uppercase
+		}
+
+		.head h1 {
+			font-size: clamp(29px, 5vw, 42px);
+			line-height: 1.1;
+			margin: 8px 0
+		}
+
+		.head p {
+			color: var(--muted);
+			margin: 0;
+			max-width: 700px
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: minmax(310px, .9fr) minmax(360px, 1.1fr);
+			gap: 18px;
+			align-items: start
+		}
+
+		.panel {
+			background: linear-gradient(155deg, #171717, #101010);
+			border: 1px solid var(--line);
+			border-radius: 17px;
+			padding: 20px;
+			box-shadow: 0 16px 45px #0005
+		}
+
+		.panel h2 {
+			font-size: 16px;
+			margin: 0 0 16px
+		}
+
+		.label {
+			display: block;
+			color: #d0d0d0;
+			font-size: 12px;
+			font-weight: 750;
+			margin-bottom: 7px
+		}
+
+		.field {
+			margin-bottom: 17px
+		}
+
+		input,
+		select,
+		textarea {
+			width: 100%;
+			background: #0b0b0b;
+			border: 1px solid #3a3a3a;
+			border-radius: 9px;
+			color: var(--text);
+			font: inherit;
+			padding: 10px 12px;
+			outline: none
+		}
+
+		input:focus,
+		select:focus,
+		textarea:focus {
+			border-color: #ddd;
+			box-shadow: 0 0 0 3px #fff1
+		}
+
+		.tzrow {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			gap: 8px
+		}
+
+		.tzrow select {
+			width: auto;
+			min-width: 88px
+		}
+
+		.calendar {
+			background: #0b0b0b;
+			border: 1px solid #303030;
+			border-radius: 13px;
+			padding: 13px
+		}
+
+		.calhead {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 12px
+		}
+
+		.month {
+			font-weight: 800
+		}
+
+		.iconbtn {
+			width: 32px;
+			height: 32px;
+			border: 1px solid #414141;
+			background: #1d1d1d;
+			color: #fff;
+			border-radius: 8px;
+			cursor: pointer;
+			font-size: 17px
+		}
+
+		.week,
+		.days {
+			display: grid;
+			grid-template-columns: repeat(7, 1fr);
+			gap: 4px
+		}
+
+		.week span {
+			text-align: center;
+			color: #858585;
+			font-size: 10px;
+			font-weight: 800;
+			padding: 5px 0
+		}
+
+		.day {
+			border: 0;
+			border-radius: 8px;
+			min-height: 36px;
+			background: transparent;
+			color: #e5e5e5;
+			cursor: pointer
+		}
+
+		.day:hover {
+			background: #292929
+		}
+
+		.day.muted {
+			color: #626262
+		}
+
+		.day.today {
+			outline: 1px solid #aaa
+		}
+
+		.day.selected {
+			background: #eee;
+			color: #111;
+			font-weight: 850;
+			box-shadow: 0 4px 14px #fff2
+		}
+
+		.quick {
+			display: flex;
+			gap: 7px;
+			flex-wrap: wrap;
+			margin-top: 10px
+		}
+
+		.chip,
+		.btn {
+			border: 1px solid #414141;
+			background: #202020;
+			color: #eee;
+			border-radius: 8px;
+			padding: 8px 11px;
+			font-weight: 700;
+			cursor: pointer
+		}
+
+		.chip {
+			font-size: 12px;
+			padding: 6px 10px
+		}
+
+		.chip:hover,
+		.btn:hover {
+			border-color: #ddd;
+			background: #303030
+		}
+
+		.timegrid {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			gap: 8px
+		}
+
+		.timegrid select {
+			text-align: center;
+			font-size: 17px;
+			font-weight: 800;
+			padding: 11px 7px
+		}
+
+		.countbox {
+			border: 1px solid #3b3b3b;
+			background: #0c0c0c;
+			border-radius: 12px;
+			padding: 13px;
+			margin-top: 15px
+		}
+
+		.count-label {
+			font-size: 11px;
+			color: #999;
+			text-transform: uppercase;
+			letter-spacing: .1em;
+			font-weight: 800
+		}
+
+		.countdown {
+			font-size: 19px;
+			font-weight: 850;
+			color: #f0f0f0;
+			margin-top: 3px
+		}
+
+		.selectedtext {
+			font-size: 13px;
+			color: #c5c5c5;
+			margin-top: 5px
+		}
+
+		textarea {
+			resize: vertical;
+			min-height: 68px
+		}
+
+		.two {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px
+		}
+
+		.btn.primary {
+			background: #eee;
+			border: 1px solid #eee;
+			color: #111
+		}
+
+		.btn.small {
+			font-size: 12px;
+			padding: 6px 9px
+		}
+
+		.btn:active,
+		.chip:active {
+			transform: translateY(1px)
+		}
+
+		.discord-preview {
+			background: #242424;
+			border: 1px solid #3a3a3a;
+			border-radius: 12px;
+			padding: 16px;
+			color: #e2e2e2;
+			min-height: 150px;
+			font-size: 14px
+		}
+
+		.discord-top {
+			display: flex;
+			align-items: center;
+			gap: 9px;
+			margin-bottom: 12px
+		}
+
+		.avatar {
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			background: #555;
+			display: grid;
+			place-items: center;
+			font-size: 15px;
+			color: #fff
+		}
+
+		.username {
+			font-size: 13px;
+			font-weight: 800;
+			color: #fff
+		}
+
+		.timestamp {
+			font-size: 10px;
+			color: #aaa;
+			margin-left: 4px
+		}
+
+		.embed {
+			border-left: 4px solid #aaa;
+			background: #2c2c2c;
+			border-radius: 4px;
+			padding: 12px 14px;
+			margin-left: 0;
+			max-width: 600px
+		}
+
+		.embedtitle {
+			font-weight: 800;
+			color: #fff;
+			font-size: 16px;
+			margin-bottom: 8px
+		}
+
+		.embedbody {
+			white-space: pre-wrap;
+			overflow-wrap: anywhere;
+			color: #ddd
+		}
+
+		.mention {
+			color: #eee;
+			background: #444;
+			border-radius: 3px;
+			padding: 1px 4px
+		}
+
+		.eventtime {
+			display: block;
+			color: #eee;
+			margin: 9px 0 3px
+		}
+
+		.relative {
+			color: #aaa;
+			font-size: 12px
+		}
+
+		.output {
+			background: #090909;
+			border: 1px solid #383838;
+			border-radius: 10px;
+			padding: 12px;
+			font: 13px/1.55 ui-monospace, Consolas, monospace;
+			white-space: pre-wrap;
+			overflow-wrap: anywhere;
+			color: #eee;
+			min-height: 90px
+		}
+
+		.outputhead {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 10px;
+			margin: 15px 0 7px
+		}
+
+		.muted {
+			color: var(--muted);
+			font-size: 12px
+		}
+
+		.formats {
+			margin-top: 14px
+		}
+
+		.format {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			align-items: center;
+			gap: 8px;
+			padding: 9px 0;
+			border-bottom: 1px solid #303030
+		}
+
+		.format:last-child {
+			border: 0
+		}
+
+		.formatname {
+			font-weight: 700;
+			font-size: 13px
+		}
+
+		.formatcode {
+			color: #c8c8c8;
+			font: 12px ui-monospace, monospace
+		}
+
+		.status {
+			min-height: 18px;
+			color: #e0e0e0;
+			font-size: 12px;
+			margin-top: 7px
+		}
+
+		.footer {
+			color: #858585;
+			font-size: 12px;
+			margin-top: 20px
+		}
+
+		@media(max-width:800px) {
+			main {
+				margin: 22px auto
+			}
+
+			.grid {
+				grid-template-columns: 1fr
+			}
+
+			.panel {
+				padding: 16px
+			}
+		}
+
+		@media(max-width:420px) {
+			.two {
+				grid-template-columns: 1fr
+			}
+
+			.timegrid select {
+				font-size: 15px
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<header class="head">
+			<div class="eyebrow">Discord utility · no login required</div>
+			<h1>Timestamp Studio <span style="color:#91aaff">⌁</span></h1>
+			<p>Pick a date and time, choose the timezone you mean, then copy a ready-to-post Discord announcement.
+				Discord shows the time in each member’s own timezone.</p>
+		</header>
+		<div class="grid">
+			<section class="panel">
+				<h2>01 · Pick the event time</h2>
+				<div class="field"><label class="label">Timezone for the time you are entering</label>
+					<div class="tzrow"><input id="zone" list="zones" value="Asia/Dhaka"
+							placeholder="Search e.g. Asia/Dhaka"><select id="zoneQuick" aria-label="Common timezone">
+							<option value="">Common zones</option>
+							<option>Asia/Dhaka</option>
+							<option>America/New_York</option>
+							<option>America/Los_Angeles</option>
+							<option>Europe/London</option>
+							<option>Europe/Berlin</option>
+							<option>Asia/Kolkata</option>
+							<option>Asia/Dubai</option>
+							<option>UTC</option>
+						</select></div><datalist id="zones"></datalist>
+					<div class="muted" style="margin-top:5px">Type an IANA timezone or select a common one.</div>
+				</div>
+				<div class="field"><label class="label">Date</label>
+					<div class="calendar">
+						<div class="calhead"><button class="iconbtn" id="prev" aria-label="Previous month">‹</button>
+							<div class="month" id="monthLabel">Month Year</div><button class="iconbtn" id="next"
+								aria-label="Next month">›</button>
+						</div>
+						<div class="week">
+							<span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+						</div>
+						<div class="days" id="days"></div>
+					</div>
+					<div class="quick"><button class="chip" id="today">Today</button><button class="chip"
+							id="tomorrow">Tomorrow</button><button class="chip" id="nextweek">In 7 days</button></div>
+				</div>
+				<div class="field"><label class="label">Time</label>
+					<div class="timegrid"><select id="hour" aria-label="Hour"></select><select id="minute"
+							aria-label="Minute"></select><select id="ampm" aria-label="AM or PM">
+							<option>AM</option>
+							<option>PM</option>
+						</select></div>
+				</div>
+				<div class="countbox">
+					<div class="count-label">Live time remaining</div>
+					<div class="countdown" id="countdown">—</div>
+					<div class="selectedtext" id="selectedText">Choose a date and time</div>
+				</div>
+			</section>
+			<section class="panel">
+				<h2>02 · Build your announcement</h2>
+				<div class="field"><label class="label" for="mention">Who are you announcing to?</label><input
+						id="mention" value="@Beta Tester" placeholder="@Beta Tester"></div>
+				<div class="field"><label class="label" for="headline">Announcement heading</label><input id="headline"
+						value="Beta testing is almost here!" placeholder="Your announcement heading"></div>
+				<div class="field"><label class="label" for="message">Message</label><textarea
+						id="message">Please be ready for the session. Make sure your game and required resources are up to date!</textarea>
+				</div>
+				<div class="two">
+					<div class="field"><label class="label" for="prefix">Time label</label><input id="prefix"
+							value="Starting"></div>
+					<div class="field"><label class="label" for="relativeLabel">Countdown label</label><input
+							id="relativeLabel" value="Time remaining"></div>
+				</div>
+				<div class="discord-preview">
+					<div class="discord-top">
+						<div class="avatar">✦</div>
+						<div><span class="username">YOUR SERVER</span><span class="timestamp">Today at 12:00 AM</span>
+						</div>
+					</div>
+					<div class="embed">
+						<div class="embedtitle" id="previewTitle">Beta testing is almost here!</div>
+						<div class="embedbody" id="previewMention"></div>
+						<div class="embedbody" id="previewMessage"></div><span class="eventtime"
+							id="previewTime">Starting: —</span>
+						<div class="relative" id="previewRelative">Time remaining: —</div>
+					</div>
+				</div>
+				<div class="outputhead"><strong style="font-size:13px">Ready to paste into Discord</strong><button
+						class="btn small primary" id="copyAnnouncement">Copy announcement</button></div>
+				<div class="output" id="announcementOutput"></div>
+				<div class="status" id="status" aria-live="polite"></div>
+				<div class="formats">
+					<div style="font-weight:800;font-size:13px;margin-bottom:4px">Other timestamp formats</div>
+					<div id="formatList"></div>
+				</div>
+			</section>
+		</div>
+		<div class="footer">The live countdown here updates every second. Discord’s <code>&lt;t:…:R&gt;</code> timestamp
+			also updates automatically for everyone who sees your message. All processing happens locally in this page.
+		</div>
+	</main>
+	<script>
+		const $ = id => document.getElementById(id), pad = n => String(n).padStart(2, '0');
+		let selectedDate = new Date(); selectedDate.setDate(selectedDate.getDate() + 1);
+		let viewYear = selectedDate.getFullYear(), viewMonth = selectedDate.getMonth();
+		const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+		if (localZone) $('zone').value = localZone;
+		try { $('zones').innerHTML = Intl.supportedValuesOf('timeZone').map(z => `<option value="${z}">`).join('') } catch (e) { }
+		for (let h = 1; h <= 12; h++)$('hour').add(new Option(pad(h), String(h)));
+		for (let m = 0; m < 60; m++)$('minute').add(new Option(pad(m), String(m)));
+		$('hour').value = '8'; $('minute').value = '00'; $('ampm').value = 'PM';
+		function sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate() }
+		function dateKey(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` }
+		function drawCalendar() {
+			const first = new Date(viewYear, viewMonth, 1), start = new Date(viewYear, viewMonth, 1 - first.getDay());
+			$('monthLabel').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+			$('days').innerHTML = '';
+			for (let i = 0; i < 42; i++) {
+				const d = new Date(start); d.setDate(start.getDate() + i);
+				const b = document.createElement('button'); b.className = 'day' + (d.getMonth() !== viewMonth ? ' muted' : '') + (sameDay(d, new Date()) ? ' today' : '') + (sameDay(d, selectedDate) ? ' selected' : ''); b.textContent = d.getDate(); b.type = 'button';
+				b.addEventListener('click', () => { selectedDate = new Date(d.getFullYear(), d.getMonth(), d.getDate()); viewYear = d.getFullYear(); viewMonth = d.getMonth(); drawCalendar(); update(); });
+				$('days').appendChild(b);
+			}
+		}
+		function setDate(d) { selectedDate = new Date(d.getFullYear(), d.getMonth(), d.getDate()); viewYear = selectedDate.getFullYear(); viewMonth = selectedDate.getMonth(); drawCalendar(); update(); }
+		$('prev').onclick = () => { viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear-- } drawCalendar() };
+		$('next').onclick = () => { viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++ } drawCalendar() };
+		$('today').onclick = () => setDate(new Date());
+		$('tomorrow').onclick = () => { const d = new Date(); d.setDate(d.getDate() + 1); setDate(d) };
+		$('nextweek').onclick = () => { const d = new Date(); d.setDate(d.getDate() + 7); setDate(d) };
+		$('zoneQuick').onchange = () => { if ($('zoneQuick').value) { $('zone').value = $('zoneQuick').value; update() } };
+		function zoneParts(epoch, zone) { const p = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(epoch)); return Object.fromEntries(p.filter(x => x.type !== 'literal').map(x => [x.type, Number(x.value)])) }
+		function toEpoch(y, mo, d, h, mi, zone) {
+			const target = Date.UTC(y, mo - 1, d, h, mi, 0); let guess = target;
+			for (let i = 0; i < 6; i++) { const p = zoneParts(guess, zone); const represented = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second); const diff = target - represented; if (!diff) return Math.floor(guess / 1000); guess += diff }
+			const p = zoneParts(guess, zone); if (p.year !== y || p.month !== mo || p.day !== d || p.hour !== h || p.minute !== mi) throw Error('This local time is skipped by daylight-saving changes. Choose another time.'); return Math.floor(guess / 1000)
+		}
+		function getEpoch() {
+			const zone = $('zone').value.trim(); try { new Intl.DateTimeFormat('en', { timeZone: zone }) } catch (e) { throw Error('Enter a valid timezone, e.g. Asia/Dhaka.') }
+			let h = Number($('hour').value) % 12; if ($('ampm').value === 'PM') h += 12;
+			return toEpoch(selectedDate.getFullYear(), selectedDate.getMonth() + 1, selectedDate.getDate(), h, Number($('minute').value), zone)
+		}
+		function code(epoch, style) { return `<t:${epoch}:${style}>` }
+		function left(epoch) { let s = epoch - Math.floor(Date.now() / 1000); if (s < 0) return 'This time has passed'; if (s === 0) return 'Starting now'; const d = Math.floor(s / 86400); s %= 86400; const h = Math.floor(s / 3600); s %= 3600; const m = Math.floor(s / 60), sec = s % 60; let a = []; if (d) a.push(`${d}d`); if (h || d) a.push(`${h}h`); if (m || h || d) a.push(`${m}m`); a.push(`${sec}s`); return a.join(' ') }
+		function discordMessage(epoch) {
+			const mention = $('mention').value.trim(), heading = $('headline').value.trim(), msg = $('message').value.trim(), prefix = $('prefix').value.trim(), rel = $('relativeLabel').value.trim();
+			return `${mention ? mention + '\\n\\n' : ''}**${heading || 'Event reminder'}**${msg ? '\\n' + msg : ''}\\n\\n${prefix ? prefix + ': ' : ''}${code(epoch, 'F')}\\n${rel ? rel + ': ' : ''}${code(epoch, 'R')}`;
+		}
+		async function copy(text) {
+			const status = $('status'); status.textContent = '';
+			try {
+				if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text) }
+				else {
+					const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.left = '-9999px'; ta.style.top = '0'; document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+					const ok = document.execCommand('copy'); ta.remove(); if (!ok) throw Error('Copy was blocked by this browser.');
+				}
+				status.textContent = '✓ Copied! Paste it directly into Discord.';
+			} catch (e) { status.textContent = 'Copy was blocked. Select the text in the output box and press Ctrl+C.' }
+		}
+		function update() {
+			try {
+				const epoch = getEpoch(), zone = $('zone').value.trim(), when = new Intl.DateTimeFormat(undefined, { timeZone: zone, dateStyle: 'full', timeStyle: 'short' }).format(new Date(epoch * 1000));
+				$('countdown').textContent = left(epoch); $('selectedText').textContent = when;
+				$('previewTitle').textContent = $('headline').value.trim() || 'Event reminder';
+				$('previewMention').textContent = $('mention').value.trim();
+				$('previewMessage').textContent = $('message').value.trim();
+				$('previewTime').textContent = ($('prefix').value.trim() ? $('prefix').value.trim() + ': ' : '') + when;
+				$('previewRelative').textContent = ($('relativeLabel').value.trim() ? $('relativeLabel').value.trim() + ': ' : '') + left(epoch);
+				$('announcementOutput').textContent = discordMessage(epoch);
+				const fmts = [['Short time', 't'], ['Long time', 'T'], ['Short date', 'd'], ['Long date', 'D'], ['Date & time', 'f'], ['Full date & time', 'F'], ['Relative countdown', 'R']];
+				$('formatList').innerHTML = fmts.map(([n, s]) => `<div class="format"><div><div class="formatname">${n}</div><div class="formatcode">${code(epoch, s)}</div></div><button class="btn small" data-style="${s}">Copy</button></div>`).join('');
+				document.querySelectorAll('[data-style]').forEach(b => b.onclick = () => copy(code(epoch, b.dataset.style)));
+			} catch (e) { $('countdown').textContent = '—'; $('selectedText').textContent = e.message; $('announcementOutput').textContent = e.message; $('status').textContent = e.message; $('formatList').innerHTML = '' }
+		}
+		$('copyAnnouncement').onclick = () => { try { copy(discordMessage(getEpoch())) } catch (e) { $('status').textContent = e.message } };
+		['zone', 'hour', 'minute', 'ampm', 'mention', 'headline', 'message', 'prefix', 'relativeLabel'].forEach(id => $(id).addEventListener('input', update));
+		$('zone').addEventListener('change', update);
+		drawCalendar(); update(); setInterval(update, 1000);
+	</script>
+</body>
+
+</html>
